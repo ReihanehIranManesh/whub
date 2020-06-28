@@ -1,0 +1,52 @@
+{% extends 'whub/base.html' %}
+
+{% block title %}Register!{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container contanireg">
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="container-fluid">
+      <div class="form-row mt-3">
+        <div class="form-group col-lg-6 col-md-6 col-sm-6 col-6 mb-0">
+          {{ form.first_name|as_crispy_field }}
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6 col-6 mb-0">
+          {{ form.last_name|as_crispy_field }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-lg-6 col-md-6 col-sm-6 col-6 mb-0">
+          {{ form.username|as_crispy_field }}
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6 col-6 mb-0">
+          {{ form.email|as_crispy_field }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-lg-6 col-md-6 col-sm-6 col-6 mb-0">
+          {{ form.password1|as_crispy_field }}
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6 col-6 mb-0 confirmation">
+          {{ form.password2|as_crispy_field }}
+        </div>
+      </div>
+      <input type="submit" class="register_btn mt-3 col-lg-6 col-md-6 col-sm-6 col-6 mb-0" value="Register">
+    </div>
+
+    <div class="bottom mt-3 mb-3">
+      Already have an account?
+      <a href="{% url 'index' %}">
+        <span class="">Log in.</span>
+      </a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

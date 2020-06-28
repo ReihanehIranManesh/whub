@@ -1,0 +1,47 @@
+{% extends "whub/base.html" %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block content %}
+
+{% if message %}
+
+{% if message == "You just logged out." %}
+<div class="alert alert-primary alert-dismissible fade show mt-3 ml-3 col-lg-3 col-md-4 col-sm-8 col-8">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  <strong>Alert!</strong> {{ message }}
+</div>
+{% else%}
+
+<div class="alert alert-danger alert-dismissible fade show mt-3 ml-3 col-lg-4 col-md-6 col-sm-6 col-7">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  <strong>Sorry!</strong> {{ message }}
+</div>
+
+{% endif %}
+
+{% endif %}
+<div class="container">
+
+  <form action="{% url 'login' %}" method="POST">
+    {% csrf_token %}
+    <label for="id_username" class=" requiredField ml-3 mt-3">
+      Username<span class="asteriskField">*</span>
+    </label>
+    <input type="text" name="username" maxlength="150" autofocus="" class="textinput textInput form-control ml-3 col-lg-10 col-md-10 col-sm-10 col-10 mb-0" required="" id="id_username">
+    <label for="id_password1" class=" requiredField ml-3 mt-3">
+      Password<span class="asteriskField">*</span>
+    </label>
+    <input type="password" name="password" class="textinput textInput form-control ml-3 col-lg-10 col-md-10 col-sm-10 col-10 mb-0" required="" id="id_password1">
+    <input type="submit" class="register_btn ml-3 col-lg-10 col-md-10 col-sm-10 col-10 mb-0" value="Log in">
+
+    <div class="login mt-4 mb-4">
+      Don't have an account?
+      <a href="{% url 'register' %}">
+        <span class="">Register.</span>
+      </a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

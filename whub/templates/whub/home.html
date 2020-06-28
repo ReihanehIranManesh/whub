@@ -1,0 +1,184 @@
+<!doctype html>
+{% load static %}
+
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="{% static 'whub/index.js' %}"></script>
+  <link rel="stylesheet" type= "text/css" href="{% static 'whub/whub.css' %}">
+  <link rel="icon" href="{% static 'whub/travel.jpg' %}"  type="image/x-icon">
+  <title>whub</title>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-expand-md navbar-expand-sm navbar-expand">
+    <a class="navbar-brand nav" href="{% url 'index' %}">
+      <img src="{% static 'whub/travel.jpg' %}" alt="Whub" width="50px;" height="50px;">
+    </a>
+
+    <div class="inputWithIcon mx-auto mt-2">
+      <input id="search-input" class="form-control" type="text" placeholder="Search..." aria-label="Search" onkeypress="return searchinp(event)">
+      <i class="fa fa-search fa-lg fa-fw" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Search" onclick="search()"></i>
+    </div>
+
+    <a class="hover-icon mr-5" href="{% url 'review' %}">
+      <i class="fa fa-pencil-square-o fa-2x fa-fw mt-2 mr-3 mb-2" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Write review"></i>
+    </a>
+    <div class="dropdown">
+      <i class="form-inline align-middle fas fa-user-circle fa-2x icon mt-1" title="Profile" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: auto;">
+        <a class="dropdown-item item" href="{% url 'user' %}">{{ user.username }}</a>
+        <hr>
+        <a class="dropdown-item item" href="{% url 'logout' %}">Log out</a>
+      </div>
+    </div>
+  </nav>
+
+  {% for review in reviews %}
+  <div class=" mt-5 mx-auto info mb-4">
+    <div class="d-flex flex-column border">
+      <div class="d-inline-flex mt-3">
+        <div class="d-flex flex-column ml-3">
+          <i class="fa fa-sort-asc fa-3x vote" aria-hidden="true"  onclick="upvote({{review.id}})"></i>
+          <p class="votes" id="v{{review.id}}">{{review.votes}}</p>
+          <i class="fa fa-sort-desc fa-3x vote" aria-hidden="true" onclick="downvote({{review.id}})"></i>
+        </div>
+        <p class="loc ml-4">{{review.city}}, {{review.country.name}}</p>
+        <p class="title category ml-3"> categories:{{review.category.name}}</p>
+        <p class="dateuser ml-3 mr-3">posted by {{review.user}} on {{review.cdatetime}}</p>
+        {% if review.image %}
+        <div class="d-flex justify-content-end ml-auto mr-4 mb-3" >
+          <img src="{{ review.image.url }}" class=" ph" >
+        </div>
+        {% else %}
+        <div class="d-flex justify-content-end ml-auto mr-4 mb-3" >
+          <img src="{% static 'whub/default.png' %}" class=" ph" >
+        </div>
+        {% endif %}
+      </div>
+      <p id="title" class="title">{{review.title}}</p>
+      <div class="text">
+        <h4 class="ml-2 header">Review:</h4>
+        <br>
+        <p class="text mr-3" id="text">{{review.text}}</p>
+      </div>
+      <div class="ml-2">
+        <h4>Dos:</h4>
+        {% for do in dos %}
+        {% if do.review == review %}
+        <p class="do text mr-3"><i class="fa fa-circle mr-2" aria-hidden="true"></i>{{do.text}}</p>
+        {% endif %}
+        {% endfor %}
+      </div>
+      <div class=" ml-2">
+        <h4>Don'ts:</h4>
+        {% for dont in donts %}
+        {% if dont.review == review %}
+        <p class="dont text mr-3"><i class="fa fa-circle mr-2" aria-hidden="true"></i>{{dont.text}}</p>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    <label class="comment mt-4">Comments:</label>
+    {% for comment in comments %}
+    {% if comment.review == review %}
+    <div class="mb-3">
+      <div class="row ml-1">
+        <img src="{% static 'whub/man.png' %}" alt="Profile" width="30px;" height="30px;">
+        <p class="dateuser ml-2">posted by {{comment.user}} on {{comment.cdatetime}}</p>
+      </div>
+      <p class="do txt mt-1">{{comment.text}}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+    <div class="sendcomment">
+      <input type="text" class="form-control cmt" placeholder="Write a comment..." maxlength="150" onkeypress="return sendcmt(event, rid = {{review.id}})" id="{{review.id}}"/>
+      <i class="fa fa-paper-plane fa-lg fa-fw" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Send" onclick="send({{review.id}})"></i>
+    </div>
+  </div>
+  {% endfor %}
+
+  {% for review in reviews %}
+  <div class="d-flex flex-column  secondinfo mt-4 mb-3 " style="margin-left: 5%;margin-right: 5%;">
+    <div class="border">
+      {% if review.image %}
+      <div>
+        <img src="{{ review.image.url }}" class="d-inline ph" >
+      </div>
+      {% else %}
+      <div>
+        <img src="{% static 'whub/default.png' %}" class="d-inline ph" >
+      </div>
+      {% endif %}
+      <div class="d-inline-flex mt-3">
+        <div class="d-flex flex-column ml-3">
+          <i class="fa fa-sort-asc fa-3x vote" aria-hidden="true"  onclick="upvote({{review.id}})"></i>
+          <p class="votes" id="s{{review.id}}">{{review.votes}}</p>
+          <i class="fa fa-sort-desc fa-3x vote" aria-hidden="true" onclick="downvote({{review.id}})"></i>
+        </div>
+        <p class="loc ml-4">{{review.city}}, {{review.country.name}}</p>
+        <p class="title category ml-3"> categories:{{review.category.name}}</p>
+        <p class="dateuser ml-3 mr-3">posted by {{review.user}} on {{review.cdatetime}}</p>
+
+      </div>
+
+      <p id="title" class="title">{{review.title}}</p>
+      <div class="text">
+        <h4 class="ml-2 header">Review:</h4>
+        <br>
+        <p class="text mr-3" id="text">{{review.text}}</p>
+      </div>
+
+      <div class="ml-2">
+        <h4>Dos:</h4>
+        {% for do in dos %}
+        {% if do.review == review %}
+        <p class="do text mr-3"><i class="fa fa-circle mr-2" aria-hidden="true"></i>{{do.text}}</p>
+        {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class=" ml-2">
+        <h4>Don'ts:</h4>
+        {% for dont in donts %}
+        {% if dont.review == review %}
+        <p class="dont text mr-3"><i class="fa fa-circle mr-2" aria-hidden="true"></i>{{dont.text}}</p>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+
+    <label class="comment mt-4">Comments:</label>
+    {% for comment in comments %}
+    {% if comment.review == review %}
+    <div class="mb-3">
+      <div class="row ml-1">
+        <img src="{% static 'whub/man.png' %}" alt="Profile" width="30px;" height="30px;">
+        <p class="dateuser ml-2">posted by {{comment.user}} on {{comment.cdatetime}}</p>
+      </div>
+      <p class="do txt mt-1">{{comment.text}}</p>
+    </div>
+
+    {% endif %}
+    {% endfor %}
+
+
+    <div class="sendcomment ml-1">
+      <input type="text" class="form-control cmt" placeholder="Write a comment..." maxlength="150" onkeypress="return sendcmt(event, rid = {{review.id}})" id="t{{review.id}}"/>
+      <i class="fa fa-paper-plane fa-lg fa-fw" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Send" onclick="send({{review.id}})"></i>
+    </div>
+
+  </div>
+  {% endfor %}
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</body>
+</html>
